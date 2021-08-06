@@ -10,11 +10,12 @@
   "license": "(MIT OR GPL-3.0)",
   "devDependencies": {
     "@codemirror/buildhelper": "^0.1.5",
+    "@rollup/plugin-node-resolve": "^13.0.4",
+    "builddocs": "^1.0.0",
     "eslint4b-prebuilt": "^6.7.1",
     "esmoduleserve": "^0.2.0",
-    "serve-static": "^1.14.1",
     "getdocs-ts": "^0.1.0",
-    "builddocs": "^1.0.0"
+    "serve-static": "^1.14.1"
   },
   "repository": {
     "type": "git",
