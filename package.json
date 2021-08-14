@@ -1,6 +1,7 @@
 {
   "description": "Development environment for the CodeMirror 6 packages",
   "scripts": {
+    "build": "npx rollup -c",
     "test": "node bin/cm.js test",
     "test-node": "node bin/cm.js test --no-browser",
     "prepare": "node bin/cm.js build",
