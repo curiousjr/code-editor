@@ -202,7 +202,9 @@ function updateDependencyVersion(pkg, version) {
 function updateAllDependencyVersions(version) {
   for (let pkg of packages) {
     let pkgFile = join(pkg.dir, "package.json"), text = fs.readFileSync(pkgFile, "utf8")
-    let updated = text.replace(/("@codemirror\/[^"]+": ")([^"]+)"/g, (_, m) => m + "^" + version + '"')
+    let updated = text.replace(/("@codemirror\/[^"]+": ")([^"]+)"/g, (_, m, old) => {
+      return m + (/buildhelper/.test(m) ? old : "^" + version) + '"'
+    })
     fs.writeFileSync(pkgFile, updated)
   }
 }
@@ -340,10 +342,15 @@ function buildReadme(name) {
 function test(...args) {
   let runTests = require("@codemirror/buildhelper/src/runtests")
   let {tests, browserTests} = runTests.gatherTests(buildPackages.map(p => p.dir))
-  let browsers = []
-  if (args.includes("--firefox")) browsers.push("firefox")
-  if (args.includes("--chrome") || (!browsers.length && !args.includes("--no-browser"))) browsers.push("chrome")
-  runTests.runTests({tests, browserTests, browsers}).then(failed => process.exit(failed ? 1 : 0))
+  let browsers = [], grep, noBrowser = false
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] == "--firefox") browsers.push("firefox")
+    if (args[i] == "--chrome") browser.push("chrome")
+    if (args[i] == "--no-browser") noBrowser = true
+    if (args[i] == "--grep") grep = args[++i]
+  }
+  if (!browsers.length && !noBrowser) browsers.push("chrome")
+  runTests.runTests({tests, browserTests, browsers, grep}).then(failed => process.exit(failed ? 1 : 0))
 }
 
 start()
