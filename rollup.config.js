@@ -4,6 +4,7 @@ export default {
   output: {
     file: "./local/dist/editor.bundle.js",
     format: "iife",
+    compact: true,
   },
   plugins: [nodeResolve()],
 };
