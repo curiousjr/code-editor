@@ -1,11 +1,10 @@
 import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
-import { javascript, esLint } from "@codemirror/lang-javascript";
+import { javascript, esLint, snippets } from "@codemirror/lang-javascript";
 import { undo, redo } from "@codemirror/history";
 import { oneDark } from "@codemirror/theme-one-dark";
 import Linter from "eslint4b-prebuilt";
 import { linter } from "@codemirror/lint";
-
-const editorId = typeof window.editorId === "string" ? window.editorId : "ide";
+import { snippetCompletion } from "@codemirror/autocomplete";
 
 const commands = {
   undo: undo,
@@ -19,17 +18,12 @@ const extensions = [
   linter(esLint(new Linter())),
 ];
 
-const editor = new EditorView({
-  state: EditorState.create({
-    extensions: extensions,
-  }),
-  parent: document.getElementById(editorId),
-});
-
-window.editor = editor;
-
-window.Editor = {
+const Editor = {
+  EditorView: EditorView,
   EditorState: EditorState,
   extensions: extensions,
   commands: commands,
+  snippets: snippets,
+  snippetCompletion: snippetCompletion,
 };
+window.Editor = Editor;
