@@ -13,7 +13,6 @@ const commands = {
 
 const extensions = [
   basicSetup,
-  javascript(),
   oneDark,
   linter(esLint(new Linter())),
 ];
@@ -25,5 +24,6 @@ const Editor = {
   commands: commands,
   snippets: snippets,
   snippetCompletion: snippetCompletion,
+  javascript: javascript,
 };
 window.Editor = Editor;

@@ -42,7 +42,7 @@
 	<script>
 		const editor = new Editor.EditorView({
 			state: Editor.EditorState.create({
-				extensions: Editor.extensions,
+				extensions: [...Editor.extensions, Editor.javascript()],
 			}),
 			parent: document.getElementById("ide"),
 		});
