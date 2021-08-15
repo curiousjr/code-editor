@@ -14,7 +14,22 @@ const commands = {
 const extensions = [
   basicSetup,
   oneDark,
-  linter(esLint(new Linter())),
+  linter(
+    esLint(new Linter(), {
+      parserOptions: { ecmaVersion: 2019, sourceType: "module" },
+      env: {
+        browser: true,
+        es6: true,
+        es2015: true,
+        es2017: true,
+        es2020: true,
+      },
+      rules: {
+        semi: ["error", "always"],
+        "no-undef": "off",
+      },
+    })
+  ),
 ];
 
 const Editor = {
