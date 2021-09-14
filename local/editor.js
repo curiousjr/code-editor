@@ -4,7 +4,11 @@ import { undo, redo } from "@codemirror/history";
 import { oneDark } from "@codemirror/theme-one-dark";
 import Linter from "eslint4b-prebuilt";
 import { linter } from "@codemirror/lint";
-import { snippetCompletion } from "@codemirror/autocomplete";
+import {
+  snippetCompletion,
+  autocompletion,
+  completeAnyWord,
+} from "@codemirror/autocomplete";
 
 const commands = {
   undo: undo,
@@ -39,6 +43,8 @@ const Editor = {
   commands: commands,
   snippets: snippets,
   snippetCompletion: snippetCompletion,
+  autocompletion: autocompletion,
+  completeAnyWord: completeAnyWord,
   javascript: javascript,
 };
 window.Editor = Editor;
