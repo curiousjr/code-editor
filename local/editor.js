@@ -1,36 +1,33 @@
 import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
-import { javascript, esLint, snippets } from "@codemirror/lang-javascript";
+import { LanguageSupport } from "@codemirror/language";
+import { pythonLanguage } from "@codemirror/lang-python";
 import { undo, redo } from "@codemirror/history";
 import { oneDark } from "@codemirror/theme-one-dark";
-import Linter from "eslint4b-prebuilt";
-import { linter } from "@codemirror/lint";
-import { snippetCompletion } from "@codemirror/autocomplete";
+import { snippetCompletion, completeFromList } from "@codemirror/autocomplete";
+
+const snippets = [
+  snippetCompletion("def ${name}(${params}) \n\t${}\n", {
+    label: "function",
+    detail: "definition",
+    type: "keyword",
+  }),
+];
+
+function python() {
+  return new LanguageSupport(
+    pythonLanguage,
+    pythonLanguage.data.of({
+      autocomplete: completeFromList(snippets),
+    })
+  );
+}
 
 const commands = {
   undo: undo,
   redo: redo,
 };
 
-const extensions = [
-  basicSetup,
-  oneDark,
-  linter(
-    esLint(new Linter(), {
-      parserOptions: { ecmaVersion: 2019, sourceType: "module" },
-      env: {
-        browser: true,
-        es6: true,
-        es2015: true,
-        es2017: true,
-        es2020: true,
-      },
-      rules: {
-        semi: ["error", "always"],
-        "no-undef": "off",
-      },
-    })
-  ),
-];
+const extensions = [basicSetup, oneDark];
 
 const Editor = {
   EditorView: EditorView,
@@ -39,6 +36,6 @@ const Editor = {
   commands: commands,
   snippets: snippets,
   snippetCompletion: snippetCompletion,
-  javascript: javascript,
+  python: python,
 };
 window.Editor = Editor;
