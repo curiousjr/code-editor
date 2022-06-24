@@ -1,47 +1,100 @@
 import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
-import { javascript, esLint, snippets } from "@codemirror/lang-javascript";
+import { LanguageSupport } from "@codemirror/language";
+import { pythonLanguage } from "@codemirror/lang-python";
 import { undo, redo } from "@codemirror/history";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { linter } from "@codemirror/lint";
-import { snippetCompletion } from "@codemirror/autocomplete";
+import { snippetCompletion, completeFromList } from "@codemirror/autocomplete";
 
-function checkErrors(source) {
+const lintErrors = [];
+
+function lintingSource(editor) {
+  const diagnostics = [];
   try {
-    pylint.parse(source);
+    lintErrors.splice(0, lintErrors.length);
+    const code = editor.state.doc.toString();
+    pylint.parse(code);
+
+    const lines = code.split("\n");
+
+    for (const lintError of lintErrors) {
+      if (lintError.startsWith("line") && !lintError.includes("<EOF>")) {
+        const parts = lintError.split(" ");
+        if (parts.length > 2) {
+          const positions = parts[1].split(":");
+          if (
+            positions.length === 2 &&
+            !isNaN(positions[0]) &&
+            !isNaN(positions[1])
+          ) {
+            const line = parseInt(positions[0]);
+            const char = parseInt(positions[1]);
+            let start = 0;
+
+            for (let i = 0; i < line - 1; i++) {
+              const codeLine = lines[i];
+              if (typeof codeLine === "string") {
+                start += codeLine.length + 1;
+              }
+            }
+
+            let message = "";
+
+            for (let i = 2; i < parts.length; i++) {
+              message += parts[i] + " ";
+            }
+
+            const end = start + char;
+
+            diagnostics.push({
+              from: end,
+              to: end,
+              severity: "error",
+              // source: "lintingSource",
+              message: message,
+              // actions: [
+              //   {
+              //     name: "fix this",
+              //     apply: function (view, from, to) {
+              //       console.log("applied");
+              //     },
+              //   },
+              // ],
+            });
+          }
+        }
+      }
+    }
   } catch (e) {
     console.error(e);
-  }
-}
-
-function lintingSource(view) {
-  const diagnostics = [];
-  if (view.state.doc.length > 2) {
-    diagnostics.push({
-      from: 1,
-      to: 2,
-      severity: "error",
-      // source: "lintingSource",
-      message: " You made a mistake",
-      // actions: [
-      //   {
-      //     name: "fix this",
-      //     apply: function (view, from, to) {
-      //       console.log("applied");
-      //     },
-      //   },
-      // ],
-    });
   }
   return diagnostics;
 }
 
-var _error = console.error;
+const _error = console.error;
 console.error = function (message) {
   if (message.startsWith("line")) {
-    console.log(message);
+    lintErrors.push(message);
   }
   _error.apply(console, arguments);
 };
+
+const snippets = [
+  snippetCompletion("def ${name}(${params}) \n\t${}\n", {
+    label: "function",
+    detail: "definition",
+    type: "keyword",
+  }),
+];
+
+function python() {
+  return new LanguageSupport(
+    pythonLanguage,
+    pythonLanguage.data.of({
+      autocomplete: completeFromList(snippets),
+    })
+  );
+}
 
 const commands = {
   undo: undo,
@@ -57,6 +110,6 @@ const Editor = {
   commands: commands,
   snippets: snippets,
   snippetCompletion: snippetCompletion,
-  javascript: javascript,
+  python: python,
 };
 window.Editor = Editor;
