@@ -2,35 +2,37 @@ import { EditorState, EditorView, basicSetup } from "@codemirror/basic-setup";
 import { javascript, esLint, snippets } from "@codemirror/lang-javascript";
 import { undo, redo } from "@codemirror/history";
 import { oneDark } from "@codemirror/theme-one-dark";
-import Linter from "eslint4b-prebuilt";
 import { linter } from "@codemirror/lint";
 import { snippetCompletion } from "@codemirror/autocomplete";
+
+function lintingSource(view) {
+  const diagnostics = [];
+  if (view.state.doc.length > 2) {
+    diagnostics.push({
+      from: 1,
+      to: 2,
+      severity: "error",
+      // source: "lintingSource",
+      message: " You made a mistake",
+      // actions: [
+      //   {
+      //     name: "fix this",
+      //     apply: function (view, from, to) {
+      //       console.log("applied");
+      //     },
+      //   },
+      // ],
+    });
+  }
+  return diagnostics;
+}
 
 const commands = {
   undo: undo,
   redo: redo,
 };
 
-const extensions = [
-  basicSetup,
-  oneDark,
-  linter(
-    esLint(new Linter(), {
-      parserOptions: { ecmaVersion: 2019, sourceType: "module" },
-      env: {
-        browser: true,
-        es6: true,
-        es2015: true,
-        es2017: true,
-        es2020: true,
-      },
-      rules: {
-        semi: ["error", "always"],
-        "no-undef": "off",
-      },
-    })
-  ),
-];
+const extensions = [basicSetup, oneDark, linter(lintingSource)];
 
 const Editor = {
   EditorView: EditorView,
