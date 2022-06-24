@@ -5,6 +5,14 @@ import { oneDark } from "@codemirror/theme-one-dark";
 import { linter } from "@codemirror/lint";
 import { snippetCompletion } from "@codemirror/autocomplete";
 
+function checkErrors(source) {
+  try {
+    pylint.parse(source);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function lintingSource(view) {
   const diagnostics = [];
   if (view.state.doc.length > 2) {
@@ -26,6 +34,14 @@ function lintingSource(view) {
   }
   return diagnostics;
 }
+
+var _error = console.error;
+console.error = function (message) {
+  if (message.startsWith("line")) {
+    console.log(message);
+  }
+  _error.apply(console, arguments);
+};
 
 const commands = {
   undo: undo,
