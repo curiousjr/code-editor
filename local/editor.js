@@ -6,10 +6,12 @@ import { oneDark } from "@codemirror/theme-one-dark";
 import { linter } from "@codemirror/lint";
 import { snippetCompletion, completeFromList } from "@codemirror/autocomplete";
 
+let lintEnabled = true;
 const lintErrors = [];
 
 function lintingSource(editor) {
   const diagnostics = [];
+  if (lintEnabled === false) return diagnostics;
   try {
     lintErrors.splice(0, lintErrors.length);
     const code = editor.state.doc.toString();
@@ -110,6 +112,9 @@ const Editor = {
   commands: commands,
   snippets: snippets,
   snippetCompletion: snippetCompletion,
+  lintEnabled: lintEnabled,
+  linter: linter,
+  lintingSource: lintingSource,
   python: python,
 };
 window.Editor = Editor;
